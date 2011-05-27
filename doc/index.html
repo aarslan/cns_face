@@ -1,0 +1,123 @@
+<HTML>
+<HEAD>
+<TITLE>HMAX</TITLE>
+<SCRIPT TYPE="text/javascript" SRC="cnspathlin.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="cnspathwin.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="cnspathmac.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="cns.js"></SCRIPT>
+</HEAD>
+<BODY>
+
+<BIG><BIG><BIG><B>HMAX Package for CNS</B></BIG></BIG></BIG><P>
+
+<TABLE>
+<TR><TD><B>Author:</B></TD><TD>Jim Mutch</TD></TR>
+<TR><TD><B>Homepage:</B></TD><TD><A HREF="http://cbcl.mit.edu/jmutch/cns/index.html#hmax">http://cbcl.mit.edu/jmutch/cns</A></TD></TR>
+</TABLE>
+
+<HR>
+
+<H2>Description</H2>
+
+This is a <A HREF="http://cbcl.mit.edu/jmutch/cns">CNS</A> <A HREF="javascript: cns('package.html');">package</A> that can be used to instantiate a broad class of feedforward object recognition models.  The package includes demo scripts to build and run the specific models described in these papers:
+
+<UL>
+<LI>Jim Mutch and David G. Lowe.  
+<I>Object class recognition and localization using sparse features with limited
+receptive fields.</I>
+International Journal of Computer Vision (IJCV), 80(1), pp. 45-57, October 2008.
+<A HREF="http://www.mit.edu/~jmutch/papers/ijcv2008_mutch_lowe.pdf">[pdf]</A><P>
+<LI>Jim Mutch and David G. Lowe.  
+<I>Multiclass Object Recognition with Sparse, Localized Features.</I>
+IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp. 11-18, New York, June 2006.
+<A HREF="http://www.mit.edu/~jmutch/papers/cvpr2006_mutch_lowe.pdf">[pdf]</A><P>
+<LI>T. Serre, A. Oliva and T. Poggio.
+<I>A feedforward architecture accounts for rapid categorization.</I>
+Proceedings of the National Academy of Science, 104(15), pp. 6424-6429, April 2007.
+<A HREF="http://www.pnas.org/content/104/15/6424.full.pdf">[pdf]</A>
+</UL>
+
+<HR>
+
+<H2><A NAME="install">Installation</A></H2>
+
+See the <A HREF="javascript: cns('install.html#package');">instructions</A> for installing packages in the CNS manual.  (CNS itself must be installed first.)<P>
+
+Once the package has been installed, make sure it's working by running the following demo script (described in more detail <A HREF="#intro">below</A>):
+
+<BLOCKQUOTE><PRE>
+>> hmax_cvpr06_run_simple
+</PRE></BLOCKQUOTE>
+
+The script should output the following lines.  The CNS manual contains a <A HREF="javascript: cns('trouble.html');">troubleshooting section</A> if you encounter problems.<P>
+
+<BLOCKQUOTE><TABLE BORDER=1><TR><TD><PRE>
+sampled 2048 "s2" features from "image_0010.jpg"
+computed feature vector for "image_0002.jpg" (??? sec)
+</PRE></TD></TR></TABLE></BLOCKQUOTE>
+
+<HR>
+
+<H2><A NAME="intro">Introduction</A></H2>
+
+Each of the feedforward recognition models described in the above papers computes a hierarchy of increasingly complex features that are increasingly invariant to position and scale.  This is done in interleaved stages that perform either tuning or pooling.  Tuning stages are named "S1", "S2", etc. and pooling stages are named "C1", "C2", etc.  Each stage is computed at multiple resolutions (scales), i.e. each stage is a scale pyramid.  (This is best illustrated in figure 2 of <A HREF="http://www.mit.edu/~jmutch/papers/ijcv2008_mutch_lowe.pdf">this</A> paper.)<P>
+
+In this <CODE>hmax</CODE> package, each of these stages is represented as a CNS <A HREF="javascript: cns('model.html#group');">group</A>, composed of multiple CNS <A HREF="javascript: cns('model.html#layerinfo');">layers</A>, one layer per scale.  This allows all the scales of a group to share common parameters and (if applicable) a common feature dictionary.  All the units or cells in a group are of the same <I>type</I> (dot product, max pooling, etc.)<P>
+
+Under the directory <CODE>hmax/demo</CODE> there are several demo scripts.<P>
+
+<TABLE BORDER="1"><TR><TD><PRE>
+<B>hmax_cvpr06_run_simple</B>
+hmax_pnas07_run_simple
+</PRE></TD><TD>
+These demo scripts illustrate the overall process of instantiating a model, learning a feature dictionary, and computing feature vectors for images.  When you start looking into the code, <B>look at <CODE>hmax_cvpr06_run_simple</CODE> first</B>.<P><P>
+</TD></TR><TR><TD><PRE>
+hmax_cvpr06_run_cal101
+hmax_cvpr06_run_uiuc
+</PRE></TD><TD>
+More extensive demo scripts that perform some of the experiments in the above papers.<P><P>
+</TD></TR><TR><TD><PRE>
+hmax_cvpr06_params_base
+hmax_cvpr06_params_full
+hmax_pnas07_params
+</PRE></TD><TD>
+Each of these contains a compact set of parameters that defines a particular feedforward model (number of "S" and "C" stages, the particular cell type of each stage, its parameters, pooling ranges, etc.)  The meaning of these parameters is documented in each cell type's "Construct" method, found in the file <CODE>hmax_<I>type</I>.m</CODE>; for example, you can read about "C" cell parameters in the file <CODE>hmax_c.m</CODE>.<P><P>
+</TD></TR></TABLE><P>
+
+The <CODE>hmax</CODE> package itself consists of the file <CODE>hmax.m</CODE> plus many pairs of files named <CODE>hmax_<I>type</I>.m</CODE> and <CODE>hmax_<I>type</I>.h</CODE>, each of which defines a different cell type.  Some of the ".m" files also contain useful methods, many of which you will have seen used in the above demo scripts.
+<UL>
+<LI><CODE>hmax.Model</CODE> - converts a compact HMAX parameter set into a full CNS <A HREF="javascript: cns('model.html');">model structure</A> which you can then instantiate and run on the GPU.
+<LI><CODE>hmax.LoadImage</CODE> - loads a new image into the input layer of an instantiated model.
+<LI><CODE>hmax_s.SampleFeatures</CODE> - adds new features to a dictionary by sampling.
+<LI>etc.
+</UL>
+
+<HR>
+
+<H2>Additional Documentation</H2>
+
+Documentation for this <CODE>hmax</CODE> package currently consists of:
+
+<UL>
+<LI>this page
+<LI>the demo scripts mentioned above
+<LI>MATLAB function and method help
+<LI>comments in source files
+</UL>
+
+<HR>
+
+<H2><A NAME="history">Revision History</A></H2>
+
+<TABLE BORDER=1><TR>
+<TD><B>Rev#</B></TD>
+<TD><B>Date</B></TD>
+<TD><B>Changes</B></TD>
+</TR><TR>
+<TD>r1</TD>
+<TD>2011-02-25</TD>
+<TD>Reorganized & renamed from "fhpkg" (Feature Hierarchy package).</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

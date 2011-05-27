@@ -1,0 +1,3 @@
+function cnspathmac() {
+return "../../doc";
+}
