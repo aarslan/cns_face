@@ -20,7 +20,7 @@
 % See also: hmax_cvpr06_run_simple, hmax_cvpr06_run_uiuc.
 
 %-----------------------------------------------------------------------------------------------------------------------
-
+matlabpool open
 clc;
 
 fprintf('\n');
@@ -119,7 +119,7 @@ count = min(numel(trainPaths), numFeatures);
 
 d = hmax_s.EmptyDict(m, m.s2, numFeatures);
 
-for i = 1 : count
+parfor i = 1 : count
 
     numSamples = floor(numFeatures / count);
     if i <= mod(numFeatures, count), numSamples = numSamples + 1; end
