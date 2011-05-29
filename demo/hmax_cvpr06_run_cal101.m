@@ -113,7 +113,7 @@ fprintf('CREATING S2 FEATURE DICTIONARY BY SAMPLING FROM TRAINING IMAGES\n');
 lib = struct;
 
 m = hmax.Model(p, lib);
-cns('init', m);
+cns('init', m, 'gpu10');
 
 count = min(numel(trainPaths), numFeatures);
 
