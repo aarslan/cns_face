@@ -20,7 +20,7 @@
 % See also: hmax_cvpr06_run_simple, hmax_cvpr06_run_uiuc.
 
 %-----------------------------------------------------------------------------------------------------------------------
-matlabpool open
+
 clc;
 
 fprintf('\n');
@@ -42,7 +42,7 @@ clear;
 if strcmp(computer, 'MACI64')
 dataPath = '/Users/aarslan/Documents/Databases/cal101/101_ObjectCategories';                % Path where the Caltech 101 dataset can be found (*** required ***).
 else
-  dataPath = '/gpfs/data/tserre/data/c101';    
+  dataPath = '/Users/aarslan/Documents/Databases/cal101/101_ObjectCategories';    
 end
 
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
@@ -119,7 +119,7 @@ count = min(numel(trainPaths), numFeatures);
 
 d = hmax_s.EmptyDict(m, m.s2, numFeatures);
 
-parfor i = 1 : count
+for i = 1 : count
 
     numSamples = floor(numFeatures / count);
     if i <= mod(numFeatures, count), numSamples = numSamples + 1; end
