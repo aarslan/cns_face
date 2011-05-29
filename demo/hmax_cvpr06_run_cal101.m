@@ -42,7 +42,7 @@ clear;
 if strcmp(computer, 'MACI64')
 dataPath = '/Users/aarslan/Documents/Databases/cal101/101_ObjectCategories';                % Path where the Caltech 101 dataset can be found (*** required ***).
 else
-  dataPath = '/Users/aarslan/Documents/Databases/cal101/101_ObjectCategories';    
+  dataPath = '/gpfs/data/tserre/data/c101';    
 end
 
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
