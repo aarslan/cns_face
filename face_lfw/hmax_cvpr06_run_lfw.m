@@ -25,12 +25,12 @@ clc;
 
 fprintf('\n');
 
-while true
-    ans = lower(strtrim(input('All variables will be cleared.  Is this okay (y/n) ? ', 's')));
-    if isempty(ans), continue; end
-    if ans(1) == 'y', break; end
-    if ans(1) == 'n', return; end
-end    
+% while true
+%     ans = lower(strtrim(input('All variables will be cleared.  Is this okay (y/n) ? ', 's')));
+%     if isempty(ans), continue; end
+%     if ans(1) == 'y', break; end
+%     if ans(1) == 'n', return; end
+% end    
 
 fprintf('\n');
 
@@ -49,9 +49,9 @@ p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this scri
                               % learned features is called "s2" and that the top stage is called "c2".
 
 numFeatures = 4096;           % Number of S2 features to learn.
-numTrain    = 5;             % Number of training images per category.
+numTrain    = 8;             % Number of training images per category.
 maxTest     = inf;            % Maximum number of test images per category.
-minSetSize  = 10;              % minimum number of images for a person required to include that person in the classification.
+minSetSize  = 15;              % minimum number of images for a person required to include that person in the classification.
 
 %-----------------------------------------------------------------------------------------------------------------------
 
