@@ -21,16 +21,14 @@
 
 %-----------------------------------------------------------------------------------------------------------------------
 
-clc;
-
-fprintf('\n');
-
 % while true
 %     ans = lower(strtrim(input('All variables will be cleared.  Is this okay (y/n) ? ', 's')));
 %     if isempty(ans), continue; end
 %     if ans(1) == 'y', break; end
 %     if ans(1) == 'n', return; end
 % end    
+
+function hmax_cvpr06_run_lfw
 
 fprintf('\n');
 
@@ -226,3 +224,5 @@ end
 fprintf('average score = %f\n', mean(scores));
 
 clear i;
+
+end
