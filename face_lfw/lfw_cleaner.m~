@@ -1,0 +1,18 @@
+function lfw_cleaner(dataPath)
+
+dirs = dir(dataPath);
+catNames = {dirs([dirs.isdir]).name};
+catNames = setdiff(catNames, {'.', '..'});
+[ans, inds] = sort(lower(catNames));
+catNames = catNames(inds);
+
+for thisDir = catNames 
+    contents = dir(thisDir{:}); 
+    contents = ~[contents(:).isdir]
+    if sum(contents) < 4
+     removeT = [remove thisDir];
+    end
+    
+end
+
+end
