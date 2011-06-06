@@ -40,7 +40,7 @@ clear;
 if strcmp(computer, 'MACI64')
 dataPath = '/Users/aarslan/Documents/Databases/lfw';                % Path where the Caltech 101 dataset can be found (*** required ***).
 else
-  dataPath = '/gpfs/data/tserre/data/c101';    
+  dataPath = '/gpfs/data/tserre/data/face_database/lfw';    
 end
 
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
