@@ -44,7 +44,7 @@ end
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
                               % learned features is called "s2" and that the top stage is called "c2".
 
-numFeatures = numel(uniqTotalSet)*2; %4096;           % Number of S2 features to learn.
+numFeatures = numel(uniqTotalSet); %4096;           % Number of S2 features to learn.
 numTrain    = 8;             % Number of training images per category.
 maxTest     = inf;            % Maximum number of test images per category.
 minSetSize  = 15;              % minimum number of images for a person required to include that person in the classification.
