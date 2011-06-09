@@ -153,6 +153,7 @@ m = hmax.Model(p, lib);
 cns('init', m);
 
 trainVectors = zeros(0, numel(trainPaths), 'single');
+testVectors = zeros(0, numel(trainPaths), 'single');
 
 for i = 1 : numel(trainPaths)
 
@@ -163,7 +164,6 @@ for i = 1 : numel(trainPaths)
 
     c2 = cns('get', -m.c2, 'val');
     c2 = cat(1, c2{:});
-
     trainVectors(1 : numel(c2), i) = c2;
 
 end
@@ -194,9 +194,9 @@ for i = 1 : numel(testPaths)
 
     c2 = cns('get', -m.c2, 'val');
     c2 = cat(1, c2{:});
-
+    testVectors(1 : numel(c2), i) = c2;%%%%%
     predCats(i) = hmax_linclass_test(class, c2);
-
+    
     if predCats(i) == testCats(i)
         fprintf('%u/%u: %s (correct)\n', i, numel(testPaths), testPaths{i});
     else

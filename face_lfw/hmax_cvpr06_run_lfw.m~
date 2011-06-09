@@ -21,16 +21,14 @@
 
 %-----------------------------------------------------------------------------------------------------------------------
 
-clc;
+% while true
+%     ans = lower(strtrim(input('All variables will be cleared.  Is this okay (y/n) ? ', 's')));
+%     if isempty(ans), continue; end
+%     if ans(1) == 'y', break; end
+%     if ans(1) == 'n', return; end
+% end    
 
-fprintf('\n');
-
-while true
-    ans = lower(strtrim(input('All variables will be cleared.  Is this okay (y/n) ? ', 's')));
-    if isempty(ans), continue; end
-    if ans(1) == 'y', break; end
-    if ans(1) == 'n', return; end
-end    
+function hmax_cvpr06_run_lfw
 
 fprintf('\n');
 
@@ -42,16 +40,16 @@ clear;
 if strcmp(computer, 'MACI64')
 dataPath = '/Users/aarslan/Documents/Databases/lfw';                % Path where the Caltech 101 dataset can be found (*** required ***).
 else
-  dataPath = '/gpfs/data/tserre/data/c101';    
+  dataPath = '/gpfs/data/tserre/data/face_database/lfw';    
 end
 
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
                               % learned features is called "s2" and that the top stage is called "c2".
 
 numFeatures = 4096;           % Number of S2 features to learn.
-numTrain    = 2;             % Number of training images per category.
+numTrain    = 8;             % Number of training images per category.
 maxTest     = inf;            % Maximum number of test images per category.
-minSetSize  = 10;              % minimum number of images for a person required to include that person in the classification.
+minSetSize  = 15;              % minimum number of images for a person required to include that person in the classification.
 
 %-----------------------------------------------------------------------------------------------------------------------
 
@@ -165,7 +163,6 @@ for i = 1 : numel(trainPaths)
 
     c2 = cns('get', -m.c2, 'val');
     c2 = cat(1, c2{:});
-
     trainVectors(1 : numel(c2), i) = c2;
 
 end
@@ -196,9 +193,9 @@ for i = 1 : numel(testPaths)
 
     c2 = cns('get', -m.c2, 'val');
     c2 = cat(1, c2{:});
-
+    testVectors(1 : numel(c2), i) = c2;%%%%%
     predCats(i) = hmax_linclass_test(class, c2);
-
+    
     if predCats(i) == testCats(i)
         fprintf('%u/%u: %s (correct)\n', i, numel(testPaths), testPaths{i});
     else
@@ -226,3 +223,5 @@ end
 fprintf('average score = %f\n', mean(scores));
 
 clear i;
+
+end
