@@ -32,8 +32,6 @@ function c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet)
 
 fprintf('\n');
 
-clear;
-
 %-----------------------------------------------------------------------------------------------------------------------
 
 % Edit this section to supply script parameters.
@@ -63,6 +61,10 @@ end
 
 %-----------------------------------------------------------------------------------------------------------------------
 
+picPaths = [repmat({dataPath}, numel(uniqTotalSet),1), uniqTotalSet];
+picPaths = cellfun(@(paths,pics) [paths '/' pics(1:end-5) '/' pics '.jpg'], picPaths(:,1), picPaths(:,2),'uni',false);
+
+%-----------------------------------------------------------------------------------------------------------------------
 
 fprintf('CREATING S2 FEATURE DICTIONARY BY SAMPLING FROM TRAINING IMAGES\n');
 
@@ -71,7 +73,16 @@ lib = struct;
 m = hmax.Model(p, lib);
 cns('init', m);
 
-count = min(numel(trainPaths), numFeatures);
+count = min(numel(picPaths), numFeatures);
+
+% load precomputed dictionnary
+if exist( 'dictionary_hmax.mat','file')==2
+    load('dictionary_hmax.mat');
+else
+    warning('The hmax dictionnary has not been computed.');
+    
+
+
 
 d = hmax_s.EmptyDict(m, m.s2, numFeatures);
 
@@ -82,7 +93,7 @@ for i = 1 : count
 
     fprintf('%u/%u: sampling %u feature(s) from %s\n', i, count, numSamples, picPaths{i});
 
-    hmax.LoadImage(m, trainPaths{i});
+    hmax.LoadImage(m, picPaths{i});
     cns('run');
 
     d = hmax_s.SampleFeatures(m, m.s2, d, numSamples);
@@ -95,6 +106,8 @@ d = hmax_s.SortFeatures(d);
 
 if cns_istype(m, -m.s2, 'ss')
     d = hmax_ss.SparsifyDict(d);
+end
+
 end
 
 lib.groups{m.s2} = d;

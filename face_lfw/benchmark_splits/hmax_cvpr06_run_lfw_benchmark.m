@@ -44,7 +44,7 @@ end
 p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
                               % learned features is called "s2" and that the top stage is called "c2".
 
-numFeatures = numel(uniqTotalSet); %4096;           % Number of S2 features to learn.
+numFeatures = 4096;           % Number of S2 features to learn.
 numTrain    = 8;             % Number of training images per category.
 maxTest     = inf;            % Maximum number of test images per category.
 minSetSize  = 15;              % minimum number of images for a person required to include that person in the classification.
@@ -66,8 +66,6 @@ picPaths = cellfun(@(paths,pics) [paths '/' pics(1:end-5) '/' pics '.jpg'], picP
 
 %-----------------------------------------------------------------------------------------------------------------------
 
-fprintf('CREATING S2 FEATURE DICTIONARY BY SAMPLING FROM TRAINING IMAGES\n');
-
 lib = struct;
 
 m = hmax.Model(p, lib);
@@ -75,28 +73,41 @@ cns('init', m);
 
 count = min(numel(picPaths), numFeatures);
 
-d = hmax_s.EmptyDict(m, m.s2, numFeatures);
+% load precomputed dictionnary
+if exist( 'dictionary_hmax.mat','file')==2
+    load('dictionary_hmax.mat');
+else
+    warning('The hmax dictionnary has not been computed.');
+    
+    fprintf('CREATING S2 FEATURE DICTIONARY BY SAMPLING FROM TRAINING IMAGES\n');
 
-for i = 1 : count
-
-    numSamples = floor(numFeatures / count);
-    if i <= mod(numFeatures, count), numSamples = numSamples + 1; end
-
-    fprintf('%u/%u: sampling %u feature(s) from %s\n', i, count, numSamples, picPaths{i});
-
-    hmax.LoadImage(m, picPaths{i});
-    cns('run');
-
-    d = hmax_s.SampleFeatures(m, m.s2, d, numSamples);
-
-end
-
-cns('done');
-
-d = hmax_s.SortFeatures(d);
-
-if cns_istype(m, -m.s2, 'ss')
-    d = hmax_ss.SparsifyDict(d);
+    picListForDic = randperm(numel(uniqTotalSet));
+    picListForDic = picListForDic(1:numFeatures);
+    
+    d = hmax_s.EmptyDict(m, m.s2, numFeatures);
+    
+    for i = 1 : count
+        
+        numSamples = floor(numFeatures / count);
+        if i <= mod(numFeatures, count), numSamples = numSamples + 1; end
+        
+        fprintf('%u/%u: sampling %u feature(s) from %s\n', i, count, numSamples, picPaths{i});
+        
+        hmax.LoadImage(m, picPaths{i});
+        cns('run');
+        
+        d = hmax_s.SampleFeatures(m, m.s2, d, numSamples);
+        
+    end
+    
+    cns('done');
+    
+    d = hmax_s.SortFeatures(d);
+    
+    if cns_istype(m, -m.s2, 'ss')
+        d = hmax_ss.SparsifyDict(d);
+    end
+    
 end
 
 lib.groups{m.s2} = d;
@@ -111,6 +122,7 @@ m = hmax.Model(p, lib);
 cns('init', m);
 
 c2s = zeros(0, numel(picPaths), 'single');
+%c1s = zeros(0, numel(picPaths), 'single');
 
 for i = 1 : numel(uniqTotalSet)
 
@@ -118,10 +130,18 @@ for i = 1 : numel(uniqTotalSet)
 
     hmax.LoadImage(m, picPaths{i});
     cns('run');
-
+    
+    c1 = cns('get', -m.c1_orig, 'val');
+    c1temp = [];
+    for k=1:length(c1)
+        c1temp = [c1temp c1{k}(:)'];
+    end
+    c1s(:,i) = c1temp;
+    
     c2 = cns('get', -m.c2, 'val');
     c2 = cat(1, c2{:});
     c2s(1 : numel(c2), i) = c2;
+    
 
 end
 
