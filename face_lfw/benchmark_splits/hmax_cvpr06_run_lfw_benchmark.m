@@ -28,7 +28,7 @@
 %     if ans(1) == 'n', return; end
 % end    
 
-function c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet)
+function c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet, parameters)
 
 fprintf('\n');
 
@@ -41,8 +41,12 @@ else
   dataPath = '/gpfs/data/tserre/data/face_database/lfw';    
 end
 
-p = hmax_cvpr06_params_full;  % Model configuration to use.  Note that this script assumes that the only stage having
+if strcmp(parameters, 'cvpr')
+p = hmax_cvpr06_params_full_lfw;  % Model configuration to use.  Note that this script assumes that the only stage having
                               % learned features is called "s2" and that the top stage is called "c2".
+else
+p = hmax_pnas07_params;
+end                  
 
 numFeatures = 4096;           % Number of S2 features to learn.
 numTrain    = 8;             % Number of training images per category.
@@ -74,8 +78,8 @@ cns('init', m);
 count = min(numel(picPaths), numFeatures);
 
 % load precomputed dictionnary
-if exist( 'dictionary_hmax.mat','file')==2
-    load('dictionary_hmax.mat');
+if exist( 'dictionary_hmax_200.mat','file')==2
+    load('dictionary_hmax_200.mat');
 else
     warning('The hmax dictionnary has not been computed.');
     
@@ -122,6 +126,7 @@ m = hmax.Model(p, lib);
 cns('init', m);
 
 c2s = zeros(0, numel(picPaths), 'single');
+c3s = zeros(0, numel(picPaths), 'single');
 %c1s = zeros(0, numel(picPaths), 'single');
 
 for i = 1 : numel(uniqTotalSet)
@@ -142,7 +147,11 @@ for i = 1 : numel(uniqTotalSet)
     c2 = cat(1, c2{:});
     c2s(1 : numel(c2), i) = c2;
     
-
+    if strcmp(parameters, 'pnas')
+        c3 = cns('get', -m.c3, 'val');
+        c3 = cat(1, c3{:});
+        c3s(1 : numel(c3), i) = c3;
+    end
 end
 
 cns('done');
