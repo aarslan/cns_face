@@ -20,7 +20,7 @@ fclose('all');
      totalSet    = [ sameSetA ; sameSetB ; diffSet1 ; diffSet2];
      uniqTotalSet = unique([totalSet{:}]);
 %     
- c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet, parameters);
+ %c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet, parameters);
 
 %trainSameNorms = zeros(300,10);
 %trainDiffNorms = zeros(300,10);
@@ -103,13 +103,17 @@ for thisSplit=allSplits
     
     testPosFeats_C1 = []; testNegFeats_C1 = []; trainPosFeats_C1 = []; trainNegFeats_C1 = [];
     testPosFeats_C2 = []; testNegFeats_C2 = []; trainPosFeats_C2 = []; trainNegFeats_C2 = [];
+    trainDiffAbsDif_C2 =[]; trainDiffAbsDif_C1 = []; trainSameAbsDif_C1 = []; trainSameAbsDif_C2 = [];
     
-    model = svmtrain(trainLabels*2-1, trainFeats_C1);
-    figure;
-    auc_C1(thisSplit) = plotroc(testLabels*2-1, testFeats_C1, model);
+%     model = svmtrain(trainLabels*2-1, trainFeats_C1);
+%     figure;
+%     auc_C1(thisSplit) = plotroc(testLabels*2-1, testFeats_C1, model);
+%     
+%     model = svmtrain(trainLabels*2-1, trainFeats_C2);
+%     figure;
+%     auc_C2(thisSplit) = plotroc(testLabels*2-1, testFeats_C2, model);
     
-    model = svmtrain(trainLabels*2-1, trainFeats_C2);
-    figure;
-    auc_C2(thisSplit) = plotroc(testLabels*2-1, testFeats_C2, model);
+    result = mkl_multiclass_ALI({trainFeats_C1', trainFeats_C2'}, trainLabels'*2-1, {testFeats_C1', testFeats_C2'}, testLabels'*2-1);
     
 end
+

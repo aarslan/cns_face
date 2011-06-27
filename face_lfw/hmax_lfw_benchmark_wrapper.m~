@@ -1,3 +1,5 @@
+parameters = 'cvpr';
+
 for splitNo=1:10
 
     % test if same person
@@ -18,7 +20,7 @@ fclose('all');
      totalSet    = [ sameSetA ; sameSetB ; diffSet1 ; diffSet2];
      uniqTotalSet = unique([totalSet{:}]);
 %     
-% c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet);
+ %c2s = hmax_cvpr06_run_lfw_benchmark(uniqTotalSet, parameters);
 
 %trainSameNorms = zeros(300,10);
 %trainDiffNorms = zeros(300,10);
@@ -35,7 +37,7 @@ for splitNo =1:10
         trainSameNorms_C1(p,splitNo) = norm([c1s(:,indA), c1s(:,indB)]);
         trainSameAbsDif_C1(p,:,splitNo) = abs(c1s(:,indA) - c1s(:,indB));
         
-        trainSameAbsDif_C2(p,:,splitNo) = abs(c1s(:,indA) - c1s(:,indB));
+        trainSameAbsDif_C2(p,:,splitNo) = abs(c2s(:,indA) - c2s(:,indB));
     end
     
     for p=1:numel(diffSet1{splitNo})
@@ -50,6 +52,8 @@ end
 
 %leave one out section
 allSplits = [1:10];
+auc_C1 = zeros(numel(allSplits),1);
+auc_C2 = zeros(numel(allSplits),1);
 
 for thisSplit=allSplits
     
@@ -57,7 +61,9 @@ for thisSplit=allSplits
     trainSplitInd = [2 3];
     %TRAIN prepare positive features
     offset = 0;
-    trainPosFeats = zeros(numel(trainSplitInd)*300, 19200);
+    trainPosFeats_C1 = zeros(numel(trainSplitInd)*300, size(c1s,1));
+    trainPosFeats_C2 = zeros(numel(trainSplitInd)*300, size(c2s,1));
+    
     for jj=trainSplitInd
         trainPosFeats_C1(1+offset:300+offset,:) = trainSameAbsDif_C1(:,:,jj);
         trainPosFeats_C2(1+offset:300+offset,:) = trainSameAbsDif_C2(:,:,jj);
@@ -66,8 +72,8 @@ for thisSplit=allSplits
     
     %TRAIN prepare Negative features
     offset = 0;
-    trainNegFeats_C1 = zeros(numel(trainSplitInd)*300, 19200);
-    trainNegFeats_C2 = zeros(numel(trainSplitInd)*300, 19200);
+    trainNegFeats_C1 = zeros(numel(trainSplitInd)*300, size(c1s,1));
+    trainNegFeats_C2 = zeros(numel(trainSplitInd)*300, size(c2s,1));
     
     for jj=trainSplitInd
         trainNegFeats_C1(1+offset:300+offset,:) = trainDiffAbsDif_C1(:,:,jj);
@@ -83,17 +89,38 @@ for thisSplit=allSplits
     
     %TEST prepare positive features & labels
     testPosFeats_C1 = trainSameAbsDif_C1(:,:,thisSplit);
+    testPosFeats_C2 = trainSameAbsDif_C2(:,:,thisSplit);
     
     %TEST prepare negative features & labels
     testNegFeats_C1 = trainDiffAbsDif_C1(:,:,thisSplit);
+    testNegFeats_C2 = trainDiffAbsDif_C2(:,:,thisSplit);
+    
     testLabels = [ones(300,1); zeros(300,1)];
     
      
-    testFeats = [testPosFeats_C1; testNegFeats_C1];
-    clear testPosFeats testNegFeats trainPosFeats trainNegFeats
+    testFeats_C1 = [testPosFeats_C1; testNegFeats_C1];
+    testFeats_C2 = [testPosFeats_C2; testNegFeats_C2];
     
-    model = svmtrain(trainLabels*2-1, trainFeats_C1);
-    figure;
-    auc(thisSplit) = plotroc(testLabels*2-1, testFeats_C1, model);
+    testPosFeats_C1 = []; testNegFeats_C1 = []; trainPosFeats_C1 = []; trainNegFeats_C1 = [];
+    testPosFeats_C2 = []; testNegFeats_C2 = []; trainPosFeats_C2 = []; trainNegFeats_C2 = [];
+    trainDiffAbsDif_C2 =[]; trainDiffAbsDif_C1 = []; trainSameAbsDif_C1 = []; trainSameAbsDif_C2 = [];
     
+%     model = svmtrain(trainLabels*2-1, trainFeats_C1);
+%     figure;
+%     auc_C1(thisSplit) = plotroc(testLabels*2-1, testFeats_C1, model);
+%     
+%     model = svmtrain(trainLabels*2-1, trainFeats_C2);
+%     figure;
+%     auc_C2(thisSplit) = plotroc(testLabels*2-1, testFeats_C2, model);
+    
+    result = mkl_multiclass_ALI({trainFeats_C1', trainFeats_C2'}, trainLabels'*2-1, {testFeats_C1', testFeats_C2'}, testLabels'*2-1);
+    
+end
+
+
+
+
+function [feats] = featsFromPairs
+
+
 end
